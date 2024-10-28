@@ -1,5 +1,9 @@
 const express = require("express");
 const app = express();
+const conn = require("./databaas");
+
+// App middleware
+app.use(express.static("frontend/"))
 
 const ajad = [
     {aine_nimi: "Matemaatika", opetaja: "Matemaatika Opetaja", "aeg_algus": "14:15", "aeg_lopp": "15:05", "kuupaev": "28.10.2024"}
