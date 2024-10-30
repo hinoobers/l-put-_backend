@@ -1,0 +1,19 @@
+form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    min-height: calc(100vh - 110px);
+}
+
+form input {
+    margin: 5px;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #CBC9AD;
+}
+
+form #login-btn {
+    background-color: #656839;
+    color: #CBD0B9;
+}
