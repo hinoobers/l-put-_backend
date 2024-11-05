@@ -61,19 +61,58 @@ app.post("/registerc", async (req, res) => {
     }
 })
 
+app.post("/unregisterc", async (req, res) => {
+    const {
+        secret,
+        course_id
+    } = req.body;
+
+    let [result] = await conn.query("SELECT * FROM kasutajad WHERE secret=?", [secret]);
+    let [result2] = await conn.query("SELECT * FROM ajad WHERE id=?", [course_id]);
+    if(result.length == 0 || result2.length == 0) {
+        return res.status(401).json({error: "Pole olemas"});
+    } else {
+        let current = JSON.parse(result2[0].registreeritud);
+        if(current.includes(result[0].id)) {
+            let copy = [];
+            current.forEach(element => {
+                if(element != result[0].id) {
+                    copy.push(element);
+                }
+            });
+            await conn.query(`UPDATE ajad SET registreeritud='${JSON.stringify(copy)}' WHERE id=${course_id}`);
+            return res.status(200).json({success: true, message: "Eemaldatud!"});
+        }
+    }
+})
+
+function makeid(length) {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;
+}
+
 app.post("/login", async (req, res) => {
     const {
         meil,
         password
     } = req.body;
 
-    let [result] = await conn.query("SELECT * FROM kasutajad WHERE meil=?", [meil]);
+    let [result] = await conn.query("SELECT * FROM kasutajad WHERE meil=? AND parool=?", [meil, password]);
     if(result.length == 0) {
         return res.status(401).json({error: "Vale parool/meil"});
     } else {
         result = result[0];
         
-        return res.status(200).json({token: result.secret})
+        const newSecret = makeid(45);
+        await conn.query(`UPDATE kasutajad SET secret=? WHERE meil=?`, [newSecret, meil])
+        return res.status(200).json({token: newSecret, roll: result.roll, id: result.id})
     }
 });
 

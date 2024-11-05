@@ -26,6 +26,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.getElementById("error").style.display = "block"
             } else {
                 localStorage.setItem("session_token", data.token)
+                localStorage.setItem("user_id", data.id)
+                localStorage.setItem("roll", data.roll)
                 window.location.href = "index.html"
             }
         })
